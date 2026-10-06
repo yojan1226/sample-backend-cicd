@@ -35,6 +35,12 @@ pipeline {
             }
         }
 
+        stage('Trivy Security Scan') {
+            steps {
+                sh 'trivy fs .'
+            }
+        }
+
         stage('Build WAR') {
             steps {
                 sh 'mvn package -DskipTests'
