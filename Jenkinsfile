@@ -19,7 +19,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        mvn sonar:sonar \
+                        mvn org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar \
                         -Dsonar.projectKey=sample-backend-cicd \
                         -Dsonar.projectName=sample-backend-cicd
                     '''
