@@ -3,9 +3,49 @@ pipeline {
 
     stages {
 
+        stage('Validate Parameters') {
+            steps {
+                script {
+
+                    def repositories = [
+                        'sample-backend-cicd': 'https://github.com/yojan1226/sample-backend-cicd.git'
+                    ]
+
+                    if (!repositories.containsKey(params.REPOSITORY)) {
+                        error "Invalid repository selected: ${params.REPOSITORY}"
+                    }
+
+                    if (!params.BRANCH?.trim()) {
+                        error "Branch must be selected."
+                    }
+
+                    if (!params.CHANGE_DESCRIPTION?.trim()) {
+                        error "Change description cannot be empty."
+                    }
+
+                    env.REPOSITORY_URL = repositories[params.REPOSITORY]
+
+                    currentBuild.description =
+                        "${params.REPOSITORY} | ${params.BRANCH} | ${params.CHANGE_DESCRIPTION}"
+
+                    echo "Repository       : ${params.REPOSITORY}"
+                    echo "Repository URL   : ${env.REPOSITORY_URL}"
+                    echo "Branch           : ${params.BRANCH}"
+                    echo "Change Description: ${params.CHANGE_DESCRIPTION}"
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
-                checkout scm
+                deleteDir()
+
+                checkout scmGit(
+                    branches: [[name: "refs/heads/${params.BRANCH}"]],
+                    userRemoteConfigs: [[
+                        url: env.REPOSITORY_URL
+                    ]]
+                )
             }
         }
 
